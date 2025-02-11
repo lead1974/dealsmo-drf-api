@@ -17,3 +17,13 @@ python manage.py runserver
 # create superuser
 python manage.py createsuperuser
 
+docker-compose -f local.yml run --rm api env
+
+# error mailhog The requested image's platform (linux/amd64) does not match the detected host platform
+# solution run in terminal (backend): export DOCKER_DEFAULT_PLATFORM=linux/amd64
+
+docker-compose -f local.yml build --no-cache
+docker-compose -f local.yml up
+
+docker compose -f local.yml up --build -d --remove-orphans
+docker compose -f local.yml logs api
