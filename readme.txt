@@ -17,4 +17,3 @@ python manage.py runserver
 # create superuser
 python manage.py createsuperuser
 
-#test
