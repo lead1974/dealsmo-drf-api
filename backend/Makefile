@@ -1,5 +1,8 @@
 build:
-	docker compose -f local.yml up --build -d --remove-orphans
+	export DOCKER_DEFAULT_PLATFORM=linux/amd64 && docker compose -f local.yml up --build -d --remove-orphans
+
+build-no-cache:
+	docker compose -f local.yml build --no-cache
 
 up:
 	docker compose -f local.yml up -d

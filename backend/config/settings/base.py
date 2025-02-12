@@ -28,9 +28,32 @@ THIRD_PARTY_APPS = [
     "phonenumber_field",
     "drf_yasg",
     "corsheaders",
+    "rest_framework.authtoken",
+    # "corsheaders",
+    # "djcelery_email",
+    # "rest_framework.authtoken",
+    # "allauth",
+    # "allauth.account",
+    # "allauth.socialaccount",
+    # "dj_rest_auth",
+    # "dj_rest_auth.registration",
+    # "taggit",
+    # "django_elasticsearch_dsl",
+    # "django_elasticsearch_dsl_drf",
+    # "django_celery_beat",
+    # "django_celery_results",
 ]
 
-LOCAL_APPS = ["core_apps.profiles", "core_apps.common", "core_apps.users"]
+LOCAL_APPS = [
+    "core_apps.profiles",
+    "core_apps.common",
+    "core_apps.users",
+    # "core_apps.articles",
+    # "core_apps.ratings",
+    # "core_apps.bookmarks",
+    # "core_apps.responses",
+    # "core_apps.search",
+]
 
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -97,6 +120,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {
+            "min_length": 4,
+        },
     },
     {
         "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
@@ -139,16 +165,23 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CORS_URLS_REGEX = r"^api/.*$"
 
+AUTH_USER_MODEL = "users.User"
+
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "%(levelname)s %(name)-12s %(asctime)s %(module)s "
+            "%(process)d %(thread)d %(message)s"
+        }
     },
-    'root': {
-        'handlers': ['console'],
-        'level': 'DEBUG',
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        }
     },
+    "root": {"level": "INFO", "handlers": ["console"]},
 }

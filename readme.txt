@@ -1,5 +1,7 @@
 pip install -r requirements/local.txt
 
+# error mailhog The requested image's platform (linux/amd64) does not match the detected host platform
+# solution run in terminal (backend): export DOCKER_DEFAULT_PLATFORM=linux/amd64
 django-admin startproject base .
 
 # generate secret key
@@ -19,9 +21,7 @@ python manage.py createsuperuser
 
 docker-compose -f local.yml run --rm api env
 
-# error mailhog The requested image's platform (linux/amd64) does not match the detected host platform
-# solution run in terminal (backend): export DOCKER_DEFAULT_PLATFORM=linux/amd64
-
+docker system prune -a
 docker-compose -f local.yml build --no-cache
 docker-compose -f local.yml up
 
