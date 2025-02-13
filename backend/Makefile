@@ -1,11 +1,11 @@
 build:
-	docker compose -f local.yml up --build -d --remove-orphans
+	CHECK_DB=true docker compose -f local.yml up --build -d --remove-orphans
 
 build-no-cache:
-	docker compose -f local.yml build --no-cache
+	CHECK_DB=true docker compose -f local.yml build --no-cache
 
 up:
-	docker compose -f local.yml up -d
+	CHECK_DB=true docker compose -f local.yml up -d
 
 down:
 	docker compose -f local.yml down

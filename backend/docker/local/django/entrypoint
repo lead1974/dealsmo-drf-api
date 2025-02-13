@@ -16,6 +16,9 @@ fi
 
 export DATABASE_URL="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}"
 
-/wait-for-it.sh db:5432 --timeout=30 -- echo "PostgreSQL is available"
+# Check if the environment variable CHECK_DB is set
+if [ "${CHECK_DB:-}" = "true" ]; then
+  /wait-for-it.sh db:5432 --timeout=5 -- echo "PostgreSQL is available"
+fi
 
 exec "$@"
