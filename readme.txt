@@ -1,3 +1,13 @@
+git reset --hard origin/main  
+docker system prune -a
+
+# migrations from scratch
+find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
+docker compose -f local.yml run --rm api python manage.py migrate --fake-initial
+docker compose -f local.yml run --rm api python manage.py flush
+docker compose -f local.yml run --rm api python manage.py showmigrations
+
+
 pip install -r requirements/local.txt
 
 # error mailhog The requested image's platform (linux/amd64) does not match the detected host platform
@@ -21,7 +31,7 @@ python manage.py createsuperuser
 
 docker-compose -f local.yml run --rm api env
 
-docker system prune -a
+
 docker-compose -f local.yml build --no-cache
 docker-compose -f local.yml up
 

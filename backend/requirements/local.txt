@@ -1,6 +1,6 @@
 -r base.txt
 
-psycopg2-binary==2.9.9
+psycopg2-binary==2.9.10
 
 watchfiles==1.0.4
 flake8==7.0.0
