@@ -1,55 +1,46 @@
 from django.contrib import admin
-from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from django import forms
-
+from django.utils.translation import gettext_lazy as _
 from .forms import UserChangeForm, UserCreationForm
 from .models import User
 
-User = get_user_model()
 
-class CustomUserCreationForm(UserCreationForm):
-    class Meta:
-        model = User
-        fields = ('email',)
-
-    def clean_email(self):
-        email = self.cleaned_data.get('email')
-
-        if not email:
-            raise forms.ValidationError("Email is required")
-
-        return email
-
-class CustomUserChangeForm(UserChangeForm):
-    class Meta:
-        model = User
-        fields = ('email',)
-
-class CustomUserAdmin(BaseUserAdmin):
-    form = CustomUserChangeForm
-    add_form = CustomUserCreationForm
+class UserAdmin(BaseUserAdmin):
+    ordering = ["email"]
+    form = UserChangeForm
+    add_form = UserCreationForm
     model = User
-    list_display = ('email', 'is_staff', 'is_active',)
-    list_filter = ('email', 'is_staff', 'is_active',)
+
+    list_display = [
+        "pkid",
+        "id",
+        "email",
+        "is_staff",
+        "is_active",
+    ]
+
+    list_display_links = ["pkid", "id", "email"]
+
+    list_filter = ["email", "is_staff", "is_active"]
+
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
-        ('Permissions', {'fields': ('is_staff', 'is_active')}),
+        (None, {
+            'fields': ('email', 'password')
+        }),
+        ('Permissions', {
+            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')
+        }),
+        ('Important dates', {
+            'fields': ('last_login', 'date_joined')
+        }),
     )
     add_fieldsets = (
         (None, {
-            'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2', 'is_staff', 'is_active')}
-        ),
+            "classes": ("wide",),
+            "fields": ("email", "password1", "password2"),
+        }),
     )
-    search_fields = ('email',)
-    ordering = ('email',)
+    search_fields = ["email"]
 
-# Register the User model if not already registered
-try:
-    admin.site.unregister(User)
-except admin.sites.NotRegistered:
-    pass
 
-admin.site.register(User, CustomUserAdmin)
+admin.site.register(User, UserAdmin)

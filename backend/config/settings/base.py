@@ -1,6 +1,7 @@
 from datetime import timedelta
 from pathlib import Path
 import environ
+import os
 
 env = environ.Env()
 
@@ -31,6 +32,7 @@ THIRD_PARTY_APPS = [
     "corsheaders",
     "rest_framework.authtoken",
     "djcelery_email",
+    "django_celery_beat",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
@@ -150,8 +152,8 @@ ADMIN_URL = "supersecret/"
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = "/staticfiles/"
-STATIC_ROOT = str(ROOT_DIR / "staticfiles")
+STATIC_URL = '/staticfiles/'
+STATIC_ROOT = os.path.join(ROOT_DIR, 'staticfiles')
 
 MEDIA_URL = "/mediafiles/"
 MEDIA_ROOT = str(ROOT_DIR / "mediafiles")
@@ -165,16 +167,37 @@ CORS_URLS_REGEX = r"^api/.*$"
 
 AUTH_USER_MODEL = "users.User"
 
-CELERY_BROKER_URL = env("CELERY_BROKER_URL")
-CELERY_RESULT_BACKEND = CELERY_BROKER_URL
-CELERY_ACCEPT_CONTENT = ["json"]
+if USE_TZ:
+    CELERY_TIMEZONE = TIME_ZONE
+
+CELERY_BROKER_URL = env("CELERY_BROKER")
+CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND")
+CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_RESULT_BACKEND_MAX_RETRIES = 10
-CELERY_TASK_SEND_SENT_EVENT = True
 
-if USE_TZ:
-    CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_SEND_SENT_EVENT = True
+CELERY_RESULT_EXTENDED = True
+
+CELERY_RESULT_BACKEND_ALWAYS_RETRY = True
+# Add this line to ensure broker connection retries on startup
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
+CELERY_TASK_TIME_LIMIT = 5 * 60
+
+CELERY_TASK_SOFT_TIME_LIMIT = 60
+
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+
+CELERY_WORKER_SEND_TASK_EVENTS = True
+
+CELERY_BEAT_SCHEDULE = {
+    "update-reputations-every-day": {
+        "task": "update_all_reputations",
+        "schedule": timedelta(days=1),
+    }
+}
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [

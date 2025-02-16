@@ -3,8 +3,9 @@ from .models import Profile
 
 
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ['user', 'username', 'first_name', 'last_name', 'phone_number', 'country', 'city']
-    fields = ['username', 'first_name', 'last_name', 'user', 'phone_number', 'about_me', 'gender', 'country', 'city', 'profile_photo', 'twitter_handle', 'followers']
+    list_display = ["pkid", "id", "user", "username"]
+    list_display_links = ["pkid", "id", "user", "username"]
+    list_filter = ["id", "pkid"]
 
 
 admin.site.register(Profile, ProfileAdmin)

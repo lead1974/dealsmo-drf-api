@@ -1,123 +1,124 @@
-# version: "3.9"
-name: dealsmo-docker
+name: dealsmo-backend
 services:
-    api:
-        container_name: dealsmo-api
-        build:
-            context: .
-            dockerfile: ./docker/local/django/Dockerfile
-        volumes:
-            - .:/app:z
-            - static_volume:/app/staticfiles
-            - media_volume:/app/mediafiles
-        expose:
-            - "8000"
-        env_file:
-            - ./.envs/.env.local
-        depends_on:
-            - postgres
-            - mailpit
-        command: ["/wait-for-it.sh", "postgres:5432", "--", "/start"]
-        networks:
-            - dealsmo-api
+  x-backend-base: &backend_base
+    build:
+      context: .
+      dockerfile: ./docker/local/django/Dockerfile
+    image: dealsmo_backend
+    volumes:
+      - .:/app:z
+      - static_volume:/app/staticfiles
+      - media_volume:/app/mediafiles
+    env_file:
+      - ./.envs/.env.local
+    expose:
+      - "8000"
+    networks:
+      - dealsmo_nw
 
-    postgres:
-        container_name: dealsmo-postgres
-        build:
-            context: .
-            dockerfile: ./docker/local/postgres/Dockerfile
-        volumes:
-            - local_postgres_data:/var/lib/postgresql/data
-            - local_postgres_data_backups:/backups
-        env_file:
-            - ./.envs/.env.local
-        networks:
-            - dealsmo-api
+  backend:
+    <<: *backend_base
+    container_name: dealsmo-backend
+    depends_on:
+      - postgres
+      - mailpit
+      - redis
+      - celeryworker
+    command: ["/wait-for-it.sh", "postgres:5432", "--", "/start"]
 
-    mailpit:
-        image: docker.io/axllent/mailpit:v1.15
-        container_name: dealsmo_mailpit
-        ports:
-            - "8025:8025"
-            - "1025:1025"
-        volumes:  
-            - dealsmo_mailpit_data:/data
-        environment:
-            MP_MAX_MESSAGES: 5000
-            MP_DATA_FILE: /data/mailpit.db
-            MP_SMTP_AUTH_ACCEPT_ANY: 1
-            MP_SMTP_AUTH_ALLOW_INSECURE: 1  
-        networks:
-            - dealsmo-api
+  postgres:
+    container_name: dealsmo-postgres
+    build:
+      context: .
+      dockerfile: ./docker/local/postgres/Dockerfile
+    volumes:
+      - local_postgres_data:/var/lib/postgresql/data
+      - local_postgres_data_backups:/backups
+    env_file:
+      - ./.envs/.env.local
+    networks:
+      - dealsmo_nw
 
-    redis:
-        image: redis:7-alpine
-        container_name: dealsmo_redis
-        networks:
-            - dealsmo-api
+  mailpit:
+    image: docker.io/axllent/mailpit:v1.15
+    container_name: dealsmo_mailpit
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    volumes:  
+      - dealsmo_mailpit_data:/data
+    environment:
+      MP_MAX_MESSAGES: 5000
+      MP_DATA_FILE: /data/mailpit.db
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1  
+    networks:
+      - dealsmo_nw
 
-    celery_worker:
-        container_name: dealsmo_celery_worker
-        build:
-            context: .
-            dockerfile: ./docker/local/django/Dockerfile
-        command: /start-celeryworker
-        volumes:
-            - .:/app
-        env_file:
-            - ./.envs/.env.local
-        depends_on:
-            - redis
-            - postgres
-            - mailpit
-        networks:
-            - dealsmo-api
+  redis:
+    image: redis:7.0-alpine3.19
+    command: redis-server --appendonly yes
+    container_name: dealsmo_redis
+    volumes:
+      - dealsmo_redis_data:/data
+    networks:
+      - dealsmo_nw
 
-    flower:
-        container_name: dealsmo_celery_flower
-        build:
-            context: .
-            dockerfile: ./docker/local/django/Dockerfile
-        command: /start-flower
-        volumes:
-            - flower_data:/data
-        env_file:
-            - ./.envs/.env.local
-        ports:
-            - "5555:5555"
-        depends_on:
-            - redis
-            - postgres
-        networks:
-            - dealsmo-api
-        image: your_flower_image
-        environment:
-            - CELERY_BROKER_URL=redis://redis:6379/0
+  celeryworker:
+    <<: *backend_base
+    image: dealsmo_celeryworker
+    container_name: dealsmo_celeryworker
+    depends_on:
+      - redis
+      - postgres
+    command: /start-celeryworker
 
-    nginx:
-        container_name: dealsmo_nginx
-        restart: always
-        depends_on:
-            - api
-        volumes:
-            - static_volume:/app/staticfiles
-            - media_volume:/app/mediafiles
-        build:
-            context: ./docker/local/nginx
-            dockerfile: Dockerfile
-        ports:
-            - "8080:80"
-        networks:
-            - dealsmo-api
+  celerybeat:
+    <<: *backend_base
+    image: dealsmo_celerybeat
+    container_name: dealsmo_celerybeat
+    depends_on:
+      - redis
+      - postgres
+    command: /start-celerybeat
+
+  flower:
+    <<: *backend_base
+    image: dealsmo_flower
+    container_name: dealsmo_flower
+    ports:
+      - "5555:5555"
+    depends_on:
+      - redis
+      - celeryworker
+    command: /start-flower
+
+  nginx:
+    container_name: dealsmo_nginx
+    build:
+      context: ./docker/local/nginx
+      dockerfile: Dockerfile
+    # restart: always    
+    ports:
+      - "8080:80"
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/app/mediafiles
+      - logs_store:/var/log/nginx
+    depends_on:
+      - backend
+    networks:
+      - dealsmo_nw 
 
 networks:
-    dealsmo-api:
-        driver: bridge
+  dealsmo_nw:
+    driver: bridge
 
 volumes:
-    static_volume:
-    media_volume:
-    local_postgres_data: {}
-    local_postgres_data_backups: {}
-    flower_data: {}
-    dealsmo_mailpit_data: {}
+  static_volume:
+  media_volume:
+  local_postgres_data: {}
+  local_postgres_data_backups: {}
+  dealsmo_mailpit_data: {}
+  dealsmo_redis_data: {}
+  logs_store: {}

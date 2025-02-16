@@ -13,20 +13,20 @@ down:
 show-logs:
 	docker compose -f local.yml logs
 
-show-logs-api:
-	docker compose -f local.yml logs api
+show-logs-backend:
+	docker compose -f local.yml logs backend
 
 makemigrations:
-	docker compose -f local.yml run --rm api python manage.py makemigrations
+	docker compose -f local.yml run --rm backend python manage.py makemigrations
 
 migrate:
-	docker compose -f local.yml run --rm api python manage.py migrate
+	docker compose -f local.yml run --rm backend python manage.py migrate
 
 collectstatic:
-	docker compose -f local.yml run --rm api python manage.py collectstatic --no-input --clear
+	docker compose -f local.yml run --rm backend python manage.py collectstatic --no-input --clear
 
 superuser:
-	docker compose -f local.yml run --rm api python manage.py createsuperuser
+	docker compose -f local.yml run --rm backend python manage.py createsuperuser
 
 down-v:
 	docker compose -f local.yml down -v
@@ -38,25 +38,25 @@ dealsmo-db:
 	docker compose -f local.yml exec postgres psql --username=balda --dbname=dealsmoDB
 
 flake8:
-	docker compose -f local.yml exec api flake8 .
+	docker compose -f local.yml exec backend flake8 .
 
 black-check:
-	docker compose -f local.yml exec api black --check --exclude=migrations .
+	docker compose -f local.yml exec backend black --check --exclude=migrations .
 
 black-diff:
-	docker compose -f local.yml exec api black --diff --exclude=migrations .
+	docker compose -f local.yml exec backend black --diff --exclude=migrations .
 
 black:
-	docker compose -f local.yml exec api black --exclude=migrations .
+	docker compose -f local.yml exec backend black --exclude=migrations .
 
 isort-check:
-	docker compose -f local.yml exec api isort . --check-only --skip venv --skip migrations
+	docker compose -f local.yml exec backend isort . --check-only --skip venv --skip migrations
 
 isort-diff:
-	docker compose -f local.yml exec api isort . --diff --skip venv --skip migrations
+	docker compose -f local.yml exec backend isort . --diff --skip venv --skip migrations
 
 isort:
-	docker compose -f local.yml exec api isort . --skip venv --skip migrations
+	docker compose -f local.yml exec backend isort . --skip venv --skip migrations
 
 db-backup:
 	docker compose -f local.yml exec postgres backup

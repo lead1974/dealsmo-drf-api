@@ -1,10 +1,15 @@
-from django.shortcuts import render
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from .serializers import UserSerializer
+from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth import get_user_model
 
-# Create your views here.
 
-class CustomUserDetailsView(APIView):
-    def get(self, request):
-        # Your logic here
-        return Response({"message": "User details"})
+class CustomUserDetailsView(RetrieveUpdateAPIView):
+    serializer_class = UserSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_object(self):
+        return self.request.user
+
+    def get_queryset(self):
+        return get_user_model().objects.none()

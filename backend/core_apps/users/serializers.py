@@ -1,5 +1,4 @@
-# type: ignore
-from dj_rest_auth.registration.serializers import RegisterSerializer 
+from dj_rest_auth.registration.serializers import RegisterSerializer
 
 from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
@@ -7,8 +6,6 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django_countries.serializer_fields import CountryField
 from phonenumber_field.serializerfields import PhoneNumberField
-from allauth.account.models import EmailAddress
-from .models import User, Profile
 
 User = get_user_model()
 
@@ -24,36 +21,53 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email', 'password']
-        extra_kwargs = {'password': {'write_only': True}}
+        fields = [
+            "id",
+            "email",
+            "first_name",
+            "last_name",
+            "gender",
+            "phone_number",
+            "profile_photo",
+            "country",
+            "city",
+        ]
 
-    def create(self, validated_data):
-        user = User.objects.create_user(**validated_data)
-        return user
-
-
-class CustomRegisterSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(required=False, allow_blank=True)
-
-    class Meta:
-        model = User
-        fields = ['email', 'password', 'username']
-
-    def create(self, validated_data):
-        # Set username to email prefix if not provided
-        if not validated_data.get('username'):
-            validated_data['username'] = validated_data['email'].split('@')[0]
-        
-        user = User.objects.create_user(**validated_data)
-        return user
+    def to_representation(self, instance):
+        representation = super(UserSerializer, self).to_representation(instance)
+        if instance.is_superuser:
+            representation["admin"] = True
+        return representation
 
 
-class ProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Profile
-        fields = ['username', 'first_name', 'last_name', 'other_fields']
-        extra_kwargs = {
-            'username': {'required': False},
-            'first_name': {'required': False},
-            'last_name': {'required': False},
+class CustomRegisterSerializer(RegisterSerializer):
+    username = None
+    first_name = serializers.CharField(required=False)
+    last_name = serializers.CharField(required=False)
+    email = serializers.EmailField(required=True)
+    password1 = serializers.CharField(write_only=True)
+    password2 = serializers.CharField(write_only=True)
+
+    def get_cleaned_data(self):
+        super().get_cleaned_data()
+        return {
+            "email": self.validated_data.get("email", ""),
+            "first_name": self.validated_data.get("first_name", ""),
+            "last_name": self.validated_data.get("last_name", ""),
+            "password1": self.validated_data.get("password1", ""),
         }
+
+    def save(self, request):
+        adapter = get_adapter()
+        user = adapter.new_user(request)
+        self.cleaned_data = self.get_cleaned_data()
+        user = adapter.save_user(request, user, self)
+        user.save()
+
+        setup_user_email(request, user, [])
+        user.email = self.cleaned_data.get("email")
+        user.password = self.cleaned_data.get("password1")
+        user.first_name = self.cleaned_data.get("first_name")
+        user.last_name = self.cleaned_data.get("last_name")
+
+        return user
