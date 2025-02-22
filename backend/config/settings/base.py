@@ -51,7 +51,7 @@ LOCAL_APPS = [
     "core_apps.articles",
     "core_apps.ratings",
     "core_apps.bookmarks",
-    # "core_apps.responses",
+    "core_apps.article_responses",
     # "core_apps.search",
 ]
 
