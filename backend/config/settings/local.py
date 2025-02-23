@@ -22,6 +22,7 @@ DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="DealsMo <noreply@delasmo
 DOMAIN = env("DOMAIN", default="localhost:8080")
 SITE_NAME = env("SITE_NAME", default="DealsMo.com")
 
+
 CELERY_BROKER_URL = env("CELERY_BROKER", default="redis://redis:6379/0")
 CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND", default="redis://redis:6379/0")
 

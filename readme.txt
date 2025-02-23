@@ -1,3 +1,10 @@
+# create virtual environment
+python -m venv venv
+source venv/bin/activate
+
+# install dependencies
+pip install -r requirements/local.txt   
+
 git reset --hard origin/main  
 docker system prune -a
 

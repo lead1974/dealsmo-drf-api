@@ -58,6 +58,13 @@ isort-diff:
 isort:
 	docker compose -f local.yml exec backend isort . --skip venv --skip migrations
 
+es-create:
+	docker compose -f local.yml exec backend python manage.py search_index --create	
+es-populate:
+	docker compose -f local.yml exec backend python manage.py search_index --populate	
+es-sync:
+	docker compose -f local.yml exec backend python manage.py search_index --rebuild	
+
 db-backup:
 	docker compose -f local.yml exec postgres backup
 db-backup-view:
