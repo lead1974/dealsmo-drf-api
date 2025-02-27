@@ -1,10 +1,10 @@
 import uuid
-from django.db import models
+
+from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.auth import get_user_model
+from django.db import IntegrityError, models
 from django.utils.translation import gettext_lazy as _
-from django.db import IntegrityError
 
 User = get_user_model()
 
@@ -50,7 +50,7 @@ class ContentView(TimeStampedModel):
         return f"{self.content_object} viewed by {self.user.get_full_name if self.user else 'Anonymous'} from IP {self.viewer_ip}"
 
     @classmethod
-    def record_view(cls, content_object, user: User, viewer_ip: str) -> None: # type: ignore
+    def record_view(cls, content_object, user: User, viewer_ip: str) -> None:  # type: ignore
         content_type = ContentType.objects.get_for_model(content_object)
         try:
             view, created = cls.objects.get_or_create(

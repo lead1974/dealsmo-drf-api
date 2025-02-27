@@ -1,9 +1,9 @@
-from rest_framework import generics
+from rest_framework import generics, permissions
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import get_object_or_404
+
 from .models import Article, ArticleResponse
 from .serializers import ArticleResponseSerializer
-from rest_framework.exceptions import PermissionDenied
-from rest_framework import permissions
 
 
 class ArticleResponseListCreateView(generics.ListCreateAPIView):
@@ -13,7 +13,9 @@ class ArticleResponseListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         article_id = self.kwargs.get("article_id")
-        return ArticleResponse.objects.filter(article__id=article_id, parent_response=None)
+        return ArticleResponse.objects.filter(
+            article__id=article_id, parent_response=None
+        )
 
     def perform_create(self, serializer):
         user = self.request.user

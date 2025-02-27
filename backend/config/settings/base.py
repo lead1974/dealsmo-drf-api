@@ -1,7 +1,8 @@
+import os
 from datetime import timedelta
 from pathlib import Path
+
 import environ
-import os
 
 env = environ.Env()
 
@@ -41,7 +42,6 @@ THIRD_PARTY_APPS = [
     "taggit",
     "django_elasticsearch_dsl",
     "django_elasticsearch_dsl_drf",
-
 ]
 
 LOCAL_APPS = [
@@ -152,8 +152,8 @@ ADMIN_URL = "supersecret/"
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = '/staticfiles/'
-STATIC_ROOT = os.path.join(ROOT_DIR, 'staticfiles')
+STATIC_URL = "/staticfiles/"
+STATIC_ROOT = os.path.join(ROOT_DIR, "staticfiles")
 
 MEDIA_URL = "/mediafiles/"
 MEDIA_ROOT = str(ROOT_DIR / "mediafiles")
