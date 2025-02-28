@@ -11,18 +11,21 @@ User = get_user_model()
 @pytest.mark.django_db
 def test_user_serializer(normal_user):
     # Ensure the user has a profile
-    Profile.objects.get_or_create(user=normal_user, defaults={
-        'username': 'testuser',
-        'first_name': 'Test',
-        'last_name': 'User',
-        'phone_number': '+17142573835',
-        'about_me': 'This is a test user.',
-        'gender': Profile.Gender.MALE,
-        'country': 'USA',
-        'city': 'New York',
-        'twitter_handle': '@testuser'
-    })
-    
+    Profile.objects.get_or_create(
+        user=normal_user,
+        defaults={
+            "username": "testuser",
+            "first_name": "Test",
+            "last_name": "User",
+            "phone_number": "+17142573835",
+            "about_me": "This is a test user.",
+            "gender": Profile.Gender.MALE,
+            "country": "USA",
+            "city": "New York",
+            "twitter_handle": "@testuser",
+        },
+    )
+
     serializer = UserSerializer(normal_user)
     assert "id" in serializer.data
     assert "email" in serializer.data
@@ -76,30 +79,28 @@ def test_custom_register_serializer(mock_request):
 class ProfileSerializerTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
-            email='testuser@example.com',
-            password='testpass123'
+            email="testuser@example.com", password="testpass123"
         )
         self.profile_attributes = {
-            'user': self.user,
-            'username': 'testuser',
-            'first_name': 'Test',
-            'last_name': 'User',
-            'phone_number': '+17142573835',
-            'about_me': 'This is a test user.',
-            'gender': Profile.Gender.MALE,
-            'country': 'USA',
-            'city': 'New York',
-            'twitter_handle': '@testuser'
+            "user": self.user,
+            "username": "testuser",
+            "first_name": "Test",
+            "last_name": "User",
+            "phone_number": "+17142573835",
+            "about_me": "This is a test user.",
+            "gender": Profile.Gender.MALE,
+            "country": "USA",
+            "city": "New York",
+            "twitter_handle": "@testuser",
         }
         self.profile, created = Profile.objects.get_or_create(
-            user=self.user,
-            defaults=self.profile_attributes
+            user=self.user, defaults=self.profile_attributes
         )
 
     def test_user_serializer(self):
         # Ensure the user has a profile
-        Profile.objects.get_or_create(user=self.user, defaults={'username': 'testuser'})
-        
+        Profile.objects.get_or_create(user=self.user, defaults={"username": "testuser"})
+
         serializer = UserSerializer(self.user)
         assert "id" in serializer.data
         assert "email" in serializer.data

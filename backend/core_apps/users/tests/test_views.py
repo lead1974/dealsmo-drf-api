@@ -35,6 +35,7 @@ def test_update_details(normal_user):
     client.force_authenticate(user=normal_user)
     url = reverse("user_details")
 
+
 def test_get_queryset_empty(normal_user):
     client = APIClient()
     client.force_authenticate(user=normal_user)

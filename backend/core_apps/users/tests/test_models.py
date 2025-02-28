@@ -34,6 +34,7 @@ def test_delete_user(normal_user):
     with pytest.raises(User.DoesNotExist):
         User.objects.get(pk=user_pk)
 
+
 @pytest.mark.django_db
 def test_normal_user_email_is_normalized(normal_user):
     email = normal_user.email
@@ -50,6 +51,7 @@ def test_super_user_email_is_normalized(super_user):
 def test_user_email_incorrect(user_factory):
     with pytest.raises(ValueError) as err:
         user_factory.create(email="realestate.com")
+
 
 @pytest.mark.django_db
 def test_create_user_with_no_email(user_factory):
@@ -93,13 +95,13 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'email', 'username', 'first_name', 'last_name']
+        fields = ["id", "email", "username", "first_name", "last_name"]
 
     def get_username(self, obj):
-        return obj.profile.username if hasattr(obj, 'profile') else None
+        return obj.profile.username if hasattr(obj, "profile") else None
 
     def get_first_name(self, obj):
-        return obj.profile.first_name if hasattr(obj, 'profile') else None
+        return obj.profile.first_name if hasattr(obj, "profile") else None
 
     def get_last_name(self, obj):
-        return obj.profile.last_name if hasattr(obj, 'profile') else None
+        return obj.profile.last_name if hasattr(obj, "profile") else None
