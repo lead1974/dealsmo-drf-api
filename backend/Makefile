@@ -72,4 +72,10 @@ db-backup-view:
 db-restore:
 	docker compose -f local.yml exec postgres restore <backup-file-name-from-docker-postgres-backups-dir> 
 
+pytest:
+	docker compose -f local.yml run --rm backend pytest -p no:warnings --cov=backend --cov=.-v
+
+pytest-report:
+	docker compose -f local.yml run --rm backend pytest -p no:warnings --cov=core_apps --cov-report=html
+
 

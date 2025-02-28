@@ -40,22 +40,6 @@ services:
     networks:
       - dealsmo_nw
 
-  # es:
-  #   image: docker.elastic.co/elasticsearch/elasticsearch:7.17.9
-  #   platform: linux/amd64  # This forces x86 emulation via Rosetta 2
-  #   environment:
-  #     - discovery.type=single-node
-  #     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-  #     - bootstrap.memory_lock=true
-  #     - "ES_JAVA_HOME=/usr/share/elasticsearch/jdk"
-  #   ulimits:
-  #     memlock:
-  #       soft: -1
-  #       hard: -1
-  #   ports:
-  #     - "9200:9200"
-  #   networks:
-  #     - dealsmo_nw
   es:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.17.9
     container_name: dealsmo-es
