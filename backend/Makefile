@@ -79,3 +79,5 @@ pytest-report:
 	docker compose -f local.yml run --rm backend pytest -p no:warnings --cov=core_apps --cov-report=html
 
 
+deploy:
+	docker compose -f local.yml exec backend python manage.py check --deploy

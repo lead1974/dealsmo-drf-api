@@ -3,25 +3,21 @@ services:
   x-backend-base: &backend_base
     build:
       context: .
-      dockerfile: ./docker/local/django/Dockerfile
+      dockerfile: ./docker/production/django/Dockerfile
     image: dealsmo_backend
     volumes:
-      - .:/app:z
       - static_volume:/app/staticfiles
       - media_volume:/app/mediafiles
     env_file:
-      - ./.envs/.env.local
-    expose:
-      - "8000"
+      - ./.envs/.env.production
     networks:
-      - dealsmo_nw
+      - reverseproxy_nw
 
   backend:
     <<: *backend_base
     container_name: dealsmo-backend
     depends_on:
       - postgres
-      - mailpit
       - redis
       - celeryworker
       - es
@@ -29,16 +25,17 @@ services:
 
   postgres:
     container_name: dealsmo-postgres
+    image: dealsmo_postgres_database
     build:
       context: .
-      dockerfile: ./docker/local/postgres/Dockerfile
+      dockerfile: ./docker/production/postgres/Dockerfile
     volumes:
-      - local_postgres_data:/var/lib/postgresql/data
-      - local_postgres_data_backups:/backups
+      - production_postgres_data:/var/lib/postgresql/data
+      - production_postgres_data_backups:/backups
     env_file:
-      - ./.envs/.env.local
+      - ./.envs/.env.production
     networks:
-      - dealsmo_nw
+      - reverseproxy_nw
 
   es:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.17.9
@@ -55,23 +52,7 @@ services:
     ports:
       - "9200:9200"
     networks:
-      - dealsmo_nw
-
-  mailpit:
-    image: docker.io/axllent/mailpit:v1.15
-    container_name: dealsmo_mailpit
-    ports:
-      - "8025:8025"
-      - "1025:1025"
-    volumes:  
-      - dealsmo_mailpit_data:/data
-    environment:
-      MP_MAX_MESSAGES: 5000
-      MP_DATA_FILE: /data/mailpit.db
-      MP_SMTP_AUTH_ACCEPT_ANY: 1
-      MP_SMTP_AUTH_ALLOW_INSECURE: 1  
-    networks:
-      - dealsmo_nw
+      - reverseproxy_nw
 
   redis:
     image: redis:7.0-alpine3.19
@@ -80,7 +61,7 @@ services:
     volumes:
       - dealsmo_redis_data:/data
     networks:
-      - dealsmo_nw
+      - reverseproxy_nw
 
   celeryworker:
     <<: *backend_base
@@ -91,7 +72,7 @@ services:
       - postgres
     command: /start-celeryworker
     networks:
-      - dealsmo_nw
+      - reverseproxy_nw
 
   celerybeat:
     <<: *backend_base
@@ -102,50 +83,31 @@ services:
       - postgres
     command: /start-celerybeat
     networks:
-      - dealsmo_nw
+      - reverseproxy_nw
 
   flower:
     <<: *backend_base
     image: dealsmo_flower
     container_name: dealsmo_flower
-    ports:
-      - "5555:5555"
     depends_on:
       - redis
       - celeryworker
     command: /start-flower
     volumes:
       - flower_data:/data
-    networks:
-      - dealsmo_nw  
-
-  nginx:
-    container_name: dealsmo_nginx
-    build:
-      context: ./docker/local/nginx
-      dockerfile: Dockerfile
-    # restart: always    
     ports:
-      - "8080:80"
-    volumes:
-      - static_volume:/app/staticfiles
-      - media_volume:/app/mediafiles
-      - logs_store:/var/log/nginx
-    depends_on:
-      - backend
+      - "5555:5555"
     networks:
-      - dealsmo_nw 
+      - reverseproxy_nw
 
 networks:
-  dealsmo_nw:
-    driver: bridge
+  reverseproxy_nw:
+    external: true
 
 volumes:
   static_volume:
   media_volume:
-  local_postgres_data: {}
-  local_postgres_data_backups: {}
-  dealsmo_mailpit_data: {}
+  production_postgres_data: {}
+  production_postgres_data_backups: {}
   dealsmo_redis_data: {}
   flower_data: {}
-  logs_store: {}
