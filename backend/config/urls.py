@@ -6,7 +6,7 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
-from core_apps.users.views import CustomUserDetailsView
+from core_apps.users.views import CustomUserDetailsView, CustomRegisterView
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -25,7 +25,8 @@ urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
     path("api/v1/auth/user/", CustomUserDetailsView.as_view(), name="user_details"),
     path("api/v1/auth/", include("dj_rest_auth.urls")),
-    path("api/v1/auth/registration/", include("dj_rest_auth.registration.urls")),
+    path("api/v1/auth/register/", CustomRegisterView.as_view(), name="rest_register"),
+    path('api/v1/auth/social/', include('core_apps.social_auth.urls')),
     path(
         "api/v1/auth/password/reset/confirm/<uidb64>/<token>/",
         PasswordResetConfirmView.as_view(),
