@@ -3,7 +3,7 @@ from rest_framework import generics, permissions
 from rest_framework.exceptions import ValidationError
 
 from core_apps.articles.models import Article
-from core_apps.ratings.exceptions import YouhaveAlreadyRated
+from core_apps.article_ratings.exceptions import YouhaveAlreadyRated
 
 from .models import Rating
 from .serializers import RatingSerializer

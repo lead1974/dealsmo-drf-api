@@ -4,13 +4,13 @@ from .views import BookmarkCreateView, BookmarkDestroyView
 
 urlpatterns = [
     path(
-        "bookmark_article/<uuid:article_id>/",
+        "create/<uuid:article_id>/",
         BookmarkCreateView.as_view(),
-        name="bookmark_article",
+        name="create_article_bookmark",
     ),
     path(
-        "unbookmark_article/<uuid:article_id>/",
+        "delete/<uuid:article_id>/",
         BookmarkDestroyView.as_view(),
-        name="unbookmark_article",
+        name="delete_article_bookmark",
     ),
 ]

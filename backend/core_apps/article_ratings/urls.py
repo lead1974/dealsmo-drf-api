@@ -4,8 +4,8 @@ from .views import RatingCreateView
 
 urlpatterns = [
     path(
-        "rate_article/<uuid:article_id>/",
+        "create/<uuid:article_id>/",
         RatingCreateView.as_view(),
-        name="rating-create",
+        name="create_article_rating",
     )
 ]

@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 class ArticleListCreateView(generics.ListCreateAPIView):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     pagination_class = ArticlePagination
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     filterset_class = ArticleFilter
@@ -44,7 +44,7 @@ class ArticleListCreateView(generics.ListCreateAPIView):
 class ArticleRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
     lookup_field = "id"
     renderer_classes = [ArticleJSONRenderer]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
@@ -69,8 +69,9 @@ class ArticleRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
         serializer = self.get_serializer(instance)
 
         viewer_ip = request.META.get("REMOTE_ADDR", None)
+        user = None if request.user.is_anonymous else request.user
         ArticleView.record_view(
-            article=instance, user=request.user, viewer_ip=viewer_ip
+            article=instance, user=user, viewer_ip=viewer_ip
         )
 
         return Response(serializer.data)
