@@ -12,6 +12,14 @@ ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 APP_DIR = ROOT_DIR / "core_apps"
 
 DEBUG = env.bool("DJANGO_DEBUG", False)
+
+# Frontend URL
+FRONTEND_URL = env.str('FRONTEND_URL', default='http://localhost:8080')
+
+# OAuth settings
+OAUTH_CALLBACK_DOMAIN = env.str('OAUTH_CALLBACK_DOMAIN', default=FRONTEND_URL)
+GOOGLE_OAUTH_CALLBACK_URL = f"{OAUTH_CALLBACK_DOMAIN}/api/v1/auth/social/google/callback/"
+
 # Application definition
 
 DJANGO_APPS = [

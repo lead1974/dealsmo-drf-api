@@ -93,3 +93,14 @@ LOGGING = {
         },
     },
 }
+
+# Frontend URL for production
+FRONTEND_URL = env.str('FRONTEND_URL', default='https://dealsmo.com')
+
+# OAuth settings for production
+OAUTH_CALLBACK_DOMAIN = env.str('OAUTH_CALLBACK_DOMAIN', default=FRONTEND_URL)
+GOOGLE_OAUTH_CALLBACK_URL = f"{OAUTH_CALLBACK_DOMAIN}/api/v1/auth/social/google/callback/"
+
+# CORS settings for production
+CORS_ORIGIN_WHITELIST = [FRONTEND_URL]
+CSRF_TRUSTED_ORIGINS = [FRONTEND_URL]

@@ -25,7 +25,7 @@ class GoogleAuthRedirectView(APIView):
 
     def get(self, request):
         client_id = settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY
-        redirect_uri = 'http://localhost:8080/api/v1/auth/social/google/callback/'
+        redirect_uri = settings.GOOGLE_OAUTH_CALLBACK_URL
         auth_url = f'https://accounts.google.com/o/oauth2/v2/auth?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile&access_type=offline'
         logger.info(f"Redirecting to Google with redirect_uri: {redirect_uri}")
         return Response({'authorization_url': auth_url})
@@ -40,7 +40,7 @@ class GoogleCallbackView(APIView):
             logger.error("No code provided in callback")
             return Response({'error': 'No code provided'}, status=status.HTTP_400_BAD_REQUEST)
 
-        redirect_uri = 'http://localhost:8080/api/v1/auth/social/google/callback/'
+        redirect_uri = settings.GOOGLE_OAUTH_CALLBACK_URL
         logger.info(f"Exchanging code for token with redirect_uri: {redirect_uri}")
 
         # Exchange code for access token
