@@ -15,14 +15,14 @@ class RatingCreateView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        article_id = self.kwargs.get("article_id")
-        if article_id:
+        article_slug = self.kwargs.get("slug")
+        if article_slug:
             try:
-                article = Article.objects.get(id=article_id)
+                article = Article.objects.get(slug=article_slug)
             except Article.DoesNotExist:
-                raise ValidationError("Invalid article_id provided")
+                raise ValidationError("Invalid article slug provided")
         else:
-            raise ValidationError("article_id is required")
+            raise ValidationError("article slug is required")
 
         try:
             serializer.save(user=self.request.user, article=article)

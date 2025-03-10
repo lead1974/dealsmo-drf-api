@@ -4,7 +4,7 @@ from .views import ArticleResponseListCreateView, ArticleResponseUpdateDeleteVie
 
 urlpatterns = [
     path(
-        "article/<uuid:article_id>/",
+        "article/<slug:slug>/",
         ArticleResponseListCreateView.as_view(),
         name="responses",
     ),

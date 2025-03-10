@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from core_apps.article_responses.serializers import ArticleResponseSerializer
-from core_apps.articles.models import Article, ArticleView, Clap
+from core_apps.articles.models import Article, ArticleView, Clap, ArticleCategory
 from core_apps.article_bookmarks.models import Bookmark
 from core_apps.article_bookmarks.serializers import BookmarkSerializer
 from core_apps.profiles.serializers import ProfileSerializer
@@ -25,6 +25,12 @@ class TagListField(serializers.Field):
         return tag_objects
 
 
+class ArticleCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ArticleCategory
+        fields = ["id", "name", "slug", "description", "parent", "created_at", "updated_at"]
+
+
 class ArticleSerializer(serializers.ModelSerializer):
     author_info = ProfileSerializer(source="author.profile", read_only=True)
     banner_image = serializers.SerializerMethodField()
@@ -41,6 +47,8 @@ class ArticleSerializer(serializers.ModelSerializer):
     )
     created_at = serializers.SerializerMethodField()
     updated_at = serializers.SerializerMethodField()
+    category = ArticleCategorySerializer(read_only=True)
+    category_id = serializers.IntegerField(write_only=True, required=False, allow_null=True)
 
     def get_article_responses_count(self, obj):
         return obj.article_responses.count()
@@ -62,7 +70,9 @@ class ArticleSerializer(serializers.ModelSerializer):
         return ArticleView.objects.filter(article=obj).count()
 
     def get_banner_image(self, obj):
-        return obj.banner_image.url
+        if obj.banner_image:
+            return obj.banner_image.url
+        return None
 
     def get_created_at(self, obj):
         now = obj.created_at
@@ -75,26 +85,33 @@ class ArticleSerializer(serializers.ModelSerializer):
         return formatted_date
 
     def create(self, validated_data):
-        tags = validated_data.pop("tags")
-        article = Article.objects.create(**validated_data)
-        article.tags.set(tags)
+        category_id = validated_data.pop("category_id", None)
+        article = super().create(validated_data)
+        
+        if category_id:
+            try:
+                category = ArticleCategory.objects.get(id=category_id)
+                article.category = category
+                article.save()
+            except ArticleCategory.DoesNotExist:
+                pass
+                
         return article
 
     def update(self, instance, validated_data):
-        instance.author = validated_data.get("author", instance.author)
-        instance.title = validated_data.get("title", instance.title)
-        instance.description = validated_data.get("description", instance.description)
-        instance.body = validated_data.get("body", instance.body)
-        instance.banner_image = validated_data.get(
-            "banner_image", instance.banner_image
-        )
-        instance.updated_at = validated_data.get("updated_at", instance.updated_at)
-
-        if "tags" in validated_data:
-            instance.tags.set(validated_data["tags"])
-
-        instance.save()
-        return instance
+        category_id = validated_data.pop("category_id", None)
+        article = super().update(instance, validated_data)
+        
+        if category_id is not None:
+            try:
+                category = ArticleCategory.objects.get(id=category_id)
+                article.category = category
+                article.save()
+            except ArticleCategory.DoesNotExist:
+                article.category = None
+                article.save()
+                
+        return article
 
     class Meta:
         model = Article
@@ -117,7 +134,10 @@ class ArticleSerializer(serializers.ModelSerializer):
             "article_responses_count",
             "created_at",
             "updated_at",
+            "category",
+            "category_id",
         ]
+        read_only_fields = ["author_info"]
 
 
 class ClapSerializer(serializers.ModelSerializer):

@@ -16,15 +16,15 @@ class BookmarkCreateView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        article_id = self.kwargs.get("article_id")
+        article_slug = self.kwargs.get("slug")
 
-        if article_id:
+        if article_slug:
             try:
-                article = Article.objects.get(id=article_id)
+                article = Article.objects.get(slug=article_slug)
             except Article.DoesNotExist:
-                raise ValidationError("Invalid article_id provided")
+                raise ValidationError("Invalid article slug provided")
         else:
-            raise ValidationError("article_id is required")
+            raise ValidationError("article slug is required")
         try:
             serializer.save(user=self.request.user, article=article)
         except IntegrityError:
@@ -33,20 +33,15 @@ class BookmarkCreateView(generics.CreateAPIView):
 
 class BookmarkDestroyView(generics.DestroyAPIView):
     queryset = Bookmark.objects.all()
-    lookup_field = "article_id"
+    lookup_field = "article__slug"
     permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self):
         user = self.request.user
-        article_id = self.kwargs.get("article_id")
+        article_slug = self.kwargs.get("slug")
 
         try:
-            UUID(str(article_id), version=4)
-        except ValueError:
-            raise ValidationError("Invalid article_id provided")
-
-        try:
-            bookmark = Bookmark.objects.get(user=user, article__id=article_id)
+            bookmark = Bookmark.objects.get(user=user, article__slug=article_slug)
         except Bookmark.DoesNotExist:
             raise NotFound("Bookmark not found or it doesn't belong to you.")
 

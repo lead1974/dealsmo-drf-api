@@ -1,17 +1,23 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 
-from .views import (
-    ArticleListCreateView,
-    ArticleRetrieveUpdateDestroyView,
-    ClapArticleView,
-)
+from .views import ArticleViewSet, ArticleViewCountView, ClapArticleView, ArticleCategoryViewSet
+
+router = DefaultRouter()
+router.register(r"", ArticleViewSet, basename="article")
+router.register(r"article-categories", ArticleCategoryViewSet, basename="article-category")
 
 urlpatterns = [
-    path("", ArticleListCreateView.as_view(), name="article-list-create"),
+    path("", include(router.urls)),
     path(
-        "<uuid:id>/",
-        ArticleRetrieveUpdateDestroyView.as_view(),
-        name="article-retrieve-update-destroy",
+        "<slug:slug>/view-count/",
+        ArticleViewCountView.as_view(),
+        name="article-view-count",
     ),
-    path("<uuid:article_id>/clap/", ClapArticleView.as_view(), name="clap-article"),
+    path(
+        "<slug:slug>/clap/",
+        ClapArticleView.as_view(),
+        name="article-clap",
+    ),
+    path("responses/", include("core_apps.article_responses.urls")),
 ]

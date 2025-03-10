@@ -11,6 +11,28 @@ from .read_time_engine import ArticleReadTimeEngine
 User = get_user_model()
 
 
+class ArticleCategory(TimeStampedModel):
+    name = models.CharField(max_length=100, unique=True)
+    slug = AutoSlugField(populate_from="name", always_update=True, unique=True)
+    description = models.TextField(blank=True)
+    parent = models.ForeignKey(
+        "self",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="children",
+        verbose_name=_("Parent Category"),
+    )
+
+    class Meta:
+        verbose_name = _("Article Category")
+        verbose_name_plural = _("Article Categories")
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+
 class Clap(TimeStampedModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     article = models.ForeignKey("Article", on_delete=models.CASCADE)
@@ -31,6 +53,14 @@ class Article(TimeStampedModel):
     body = models.TextField(verbose_name=_("article content"))
     banner_image = models.ImageField(
         verbose_name=_("banner image"), default="/profile_default.png"
+    )
+    category = models.ForeignKey(
+        ArticleCategory,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="articles",
+        verbose_name=_("Article Category"),
     )
     tags = TaggableManager()
 

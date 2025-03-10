@@ -8,19 +8,23 @@ from .serializers import ArticleResponseSerializer
 
 class ArticleResponseListCreateView(generics.ListCreateAPIView):
     queryset = ArticleResponse.objects.all()
-    permission_classes = [permissions.IsAuthenticated]
     serializer_class = ArticleResponseSerializer
 
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated()]
+
     def get_queryset(self):
-        article_id = self.kwargs.get("article_id")
+        article_slug = self.kwargs.get("slug")
         return ArticleResponse.objects.filter(
-            article__id=article_id, parent_response=None
+            article__slug=article_slug, parent_response=None
         )
 
     def perform_create(self, serializer):
         user = self.request.user
-        article_id = self.kwargs.get("article_id")
-        article = get_object_or_404(Article, id=article_id)
+        article_slug = self.kwargs.get("slug")
+        article = get_object_or_404(Article, slug=article_slug)
         serializer.save(user=user, article=article)
 
 
@@ -28,6 +32,11 @@ class ArticleResponseUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     queryset = ArticleResponse.objects.all()
     serializer_class = ArticleResponseSerializer
     lookup_field = "id"
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated()]
 
     def perform_update(self, serializer):
         user = self.request.user

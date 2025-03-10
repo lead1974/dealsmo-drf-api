@@ -47,3 +47,12 @@ docker-compose -f local.yml up --build -d --remove-orphans
 
 # Check logs
 docker-compose -f local.yml logs backend
+
+Article missing features
+Draft system and article scheduling
+Rich text editor support
+Better image management
+Categories system
+SEO improvements
+Basic analytics
+Enhanced comment system with moderation
