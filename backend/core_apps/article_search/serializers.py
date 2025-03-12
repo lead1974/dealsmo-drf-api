@@ -6,4 +6,4 @@ from .documents import ArticleDocument
 class ArticleElasticSearchSerializer(DocumentSerializer):
     class Meta:
         document = ArticleDocument
-        fields = ["title", "author", "slug", "description", "body", "created_at", "tags"]
+        fields = ["id", "slug", "title", "description", "body", "author_username", "author_email", "created_at", "tags"]

@@ -30,23 +30,49 @@ class ArticleElasticSearchView(DocumentViewSet):
         "title",
         "description",
         "body",
-        "author_first_name",
-        "author_last_name",
+        "author_username",
+        "author_email",
         "tags",
     )
-    filter_fields = {"slug": "slug.raw", "created_at": "created_at"}
+    filter_fields = {
+        "slug": "slug",
+        "created_at": "created_at",
+        "id": "id",
+        "author_email": "author_email",
+    }
 
     ordering_fields = {"created_at": "created_at"}
     ordering = ("-created_at",)
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        search = self.request.query_params.get('search', None)
         tags = self.request.query_params.get('tags', None)
         
+        if search:
+            # Create a multi_match query for all search fields
+            query = Q(
+                'multi_match',
+                query=search,
+                fields=self.search_fields,
+                type='best_fields'
+            )
+            queryset = queryset.query(query)
+        
         if tags:
-            # Split tags by comma and create a list of terms query
             tag_list = [tag.strip() for tag in tags.split(',')]
-            # Create a terms query that matches any of the tags
             queryset = queryset.query('terms', tags=tag_list)
+        
+        # Add collapse to ensure unique results and include top hits
+        queryset = queryset.extra(
+            collapse={
+                'field': 'id',
+                'inner_hits': {
+                    'name': 'most_recent',
+                    'size': 1,
+                    'sort': [{'created_at': 'desc'}]
+                }
+            }
+        )
             
         return queryset

@@ -23,7 +23,8 @@ class ArticleReadTimeEngine:
         if article.banner_image:
             reading_time += seconds_per_image / 60
 
-        tag_count = article.tags.count()
+        # Handle both list and queryset cases for tags
+        tag_count = len(article.tags) if isinstance(article.tags, list) else article.tags.count()
         reading_time += (tag_count * seconds_per_tag) / 60
 
         reading_time = ceil(reading_time)

@@ -4,8 +4,8 @@ from rest_framework.routers import DefaultRouter
 from .views import ArticleViewSet, ArticleViewCountView, ClapArticleView, ArticleCategoryViewSet
 
 router = DefaultRouter()
-router.register(r"", ArticleViewSet, basename="article")
 router.register(r"article-categories", ArticleCategoryViewSet, basename="article-category")
+router.register(r"", ArticleViewSet, basename="article")
 
 urlpatterns = [
     path("", include(router.urls)),

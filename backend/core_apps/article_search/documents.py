@@ -6,10 +6,13 @@ from core_apps.articles.models import Article
 
 @registry.register_document
 class ArticleDocument(Document):
+    id = fields.KeywordField()
+    slug = fields.KeywordField()
     title = fields.TextField(attr="title")
     description = fields.TextField(attr="description")
     body = fields.TextField(attr="body")
     author_username = fields.TextField()
+    author_email = fields.TextField()
     tags = fields.KeywordField()
 
     class Index:
@@ -23,5 +26,16 @@ class ArticleDocument(Document):
     def prepare_author_username(self, instance):
         return instance.author.profile.username
 
+    def prepare_author_email(self, instance):
+        return instance.author.email
+
     def prepare_tags(self, instance):
+        if isinstance(instance.tags, list):
+            return instance.tags
         return [tag.name for tag in instance.tags.all()]
+
+    def prepare_id(self, instance):
+        return str(instance.id)
+
+    def prepare_slug(self, instance):
+        return instance.slug

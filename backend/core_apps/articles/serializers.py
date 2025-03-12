@@ -9,6 +9,8 @@ from core_apps.profiles.serializers import ProfileSerializer
 
 class TagListField(serializers.Field):
     def to_representation(self, value):
+        if isinstance(value, list):
+            return value
         return [tag.name for tag in value.all()]
 
     def to_internal_value(self, data):
@@ -49,6 +51,41 @@ class ArticleSerializer(serializers.ModelSerializer):
     updated_at = serializers.SerializerMethodField()
     category = ArticleCategorySerializer(read_only=True)
     category_id = serializers.IntegerField(write_only=True, required=False, allow_null=True)
+    status = serializers.ChoiceField(choices=Article.Status.choices, required=False)
+    is_published = serializers.ReadOnlyField()
+    start_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ")
+    end_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ")
+
+    def validate_status(self, value):
+        request = self.context.get('request')
+        if not request or not request.user:
+            raise serializers.ValidationError("Authentication required to change status")
+
+        # If this is an update operation
+        if self.instance:
+            # Only author or staff can change status
+            if not (request.user.is_staff or request.user == self.instance.author):
+                raise serializers.ValidationError("Only the author or staff can change the article status")
+
+        return value
+
+    def validate(self, data):
+        if 'start_date' in data and 'end_date' in data:
+            if data['start_date'] >= data['end_date']:
+                raise serializers.ValidationError({
+                    'end_date': 'End date must be after start date'
+                })
+        elif 'start_date' in data and self.instance:
+            if data['start_date'] >= self.instance.end_date:
+                raise serializers.ValidationError({
+                    'start_date': 'Start date must be before end date'
+                })
+        elif 'end_date' in data and self.instance:
+            if self.instance.start_date >= data['end_date']:
+                raise serializers.ValidationError({
+                    'end_date': 'End date must be after start date'
+                })
+        return data
 
     def get_article_responses_count(self, obj):
         return obj.article_responses.count()
@@ -75,14 +112,10 @@ class ArticleSerializer(serializers.ModelSerializer):
         return None
 
     def get_created_at(self, obj):
-        now = obj.created_at
-        formatted_date = now.strftime("%m/%d/%Y, %H:%M:%S")
-        return formatted_date
+        return obj.created_at.strftime("%Y-%m-%dT%H:%M:%SZ")
 
     def get_updated_at(self, obj):
-        then = obj.updated_at
-        formatted_date = then.strftime("%m/%d/%Y, %H:%M:%S")
-        return formatted_date
+        return obj.updated_at.strftime("%Y-%m-%dT%H:%M:%SZ")
 
     def create(self, validated_data):
         category_id = validated_data.pop("category_id", None)
@@ -136,6 +169,10 @@ class ArticleSerializer(serializers.ModelSerializer):
             "updated_at",
             "category",
             "category_id",
+            "status",
+            "start_date",
+            "end_date",
+            "is_published",
         ]
         read_only_fields = ["author_info"]
 
