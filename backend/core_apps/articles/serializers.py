@@ -30,7 +30,7 @@ class TagListField(serializers.Field):
 class ArticleCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ArticleCategory
-        fields = ["id", "name", "slug", "description", "parent", "created_at", "updated_at"]
+        fields = ["pkid", "id", "name", "slug", "description", "parent", "created_at", "updated_at"]
 
 
 class ArticleSerializer(serializers.ModelSerializer):
@@ -50,7 +50,7 @@ class ArticleSerializer(serializers.ModelSerializer):
     created_at = serializers.SerializerMethodField()
     updated_at = serializers.SerializerMethodField()
     category = ArticleCategorySerializer(read_only=True)
-    category_id = serializers.IntegerField(write_only=True, required=False, allow_null=True)
+    category_id = serializers.UUIDField(write_only=True, required=False, allow_null=True)
     status = serializers.ChoiceField(choices=Article.Status.choices, required=False)
     is_published = serializers.ReadOnlyField()
     start_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ")
@@ -132,17 +132,24 @@ class ArticleSerializer(serializers.ModelSerializer):
         return article
 
     def update(self, instance, validated_data):
+        print("Update method called with data:", validated_data)
         category_id = validated_data.pop("category_id", None)
+        print("Category ID from request:", category_id)
         article = super().update(instance, validated_data)
         
         if category_id is not None:
             try:
+                print("Attempting to fetch category with ID:", category_id)
                 category = ArticleCategory.objects.get(id=category_id)
+                print("Found category:", category)
                 article.category = category
                 article.save()
+                print("Article updated with category")
             except ArticleCategory.DoesNotExist:
+                print("Category not found with ID:", category_id)
                 article.category = None
                 article.save()
+                print("Article category set to None")
                 
         return article
 

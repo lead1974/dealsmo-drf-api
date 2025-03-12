@@ -15,6 +15,8 @@ class ArticleFilter(filters.FilterSet):
     start_date = filters.DateFromToRangeFilter(field_name="start_date")
     end_date = filters.DateFromToRangeFilter(field_name="end_date")
     is_active = filters.BooleanFilter(method='filter_is_active')
+    category_id = filters.UUIDFilter(field_name="category__id")
+    category_slug = filters.CharFilter(field_name="category__slug")
 
     def filter_is_active(self, queryset, name, value):
         now = timezone.now()
@@ -38,4 +40,6 @@ class ArticleFilter(filters.FilterSet):
             "start_date",
             "end_date",
             "is_active",
+            "category_id",
+            "category_slug",
         ]
