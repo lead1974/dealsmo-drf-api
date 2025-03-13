@@ -39,6 +39,7 @@ THIRD_PARTY_APPS = [
     "django_countries",
     "phonenumber_field",
     "drf_yasg",
+    "drf_spectacular",
     "corsheaders",
     "social_django",
     "taggit",
@@ -231,6 +232,7 @@ REST_FRAMEWORK = {
     "DEFAULT_FILTER_BACKENDS": [
         "django_filters.rest_framework.DjangoFilterBackend",
     ],
+    "DEFAULT_SCHEMA_CLASS": 'drf_spectacular.openapi.AutoSchema',
 }
 
 SIMPLE_JWT = {
@@ -300,4 +302,17 @@ LOGGING = {
         }
     },
     "root": {"level": "INFO", "handlers": ["console"]},
+}
+
+# DRF Spectacular settings
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'DealsMo.com API',
+    'DESCRIPTION': 'API endpoints for DealsMo.com API',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'persistAuthorization': True,
+    },
 }
