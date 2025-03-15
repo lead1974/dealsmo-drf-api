@@ -6,6 +6,7 @@ from django_elasticsearch_dsl_drf.filter_backends import (
     SearchFilterBackend,
 )
 from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import permissions
 from elasticsearch_dsl import Q
 
@@ -13,6 +14,29 @@ from .documents import ArticleDocument
 from .serializers import ArticleElasticSearchSerializer
 
 
+@extend_schema(
+    tags=['search'],
+    parameters=[
+        OpenApiParameter(
+            name='search',
+            description='Search query string to search in title, description, body, author info, and tags',
+            required=False,
+            type=str
+        ),
+        OpenApiParameter(
+            name='tags',
+            description='Filter by tags (comma-separated)',
+            required=False,
+            type=str
+        ),
+        OpenApiParameter(
+            name='ordering',
+            description='Sort by field (e.g. created_at or -created_at for descending)',
+            required=False,
+            type=str
+        )
+    ]
+)
 class ArticleElasticSearchView(DocumentViewSet):
     document = ArticleDocument
     serializer_class = ArticleElasticSearchSerializer

@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status
 from rest_framework.exceptions import NotFound
 from rest_framework.parsers import MultiPartParser
@@ -19,6 +20,7 @@ from .serializers import FollowingSerializer, ProfileSerializer, UpdateProfileSe
 User = get_user_model()
 
 
+@extend_schema(tags=['profiles'])
 class ProfileListAPIView(generics.ListAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
@@ -26,6 +28,7 @@ class ProfileListAPIView(generics.ListAPIView):
     renderer_classes = [ProfilesJSONRenderer]
 
 
+@extend_schema(tags=['profiles'])
 class ProfileDetailAPIView(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = ProfileSerializer

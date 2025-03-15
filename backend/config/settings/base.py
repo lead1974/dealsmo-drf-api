@@ -314,5 +314,15 @@ SPECTACULAR_SETTINGS = {
     'SWAGGER_UI_SETTINGS': {
         'deepLinking': True,
         'persistAuthorization': True,
+        'tagsSorter': 'alpha',  # Sort tags alphabetically
+        'operationsSorter': 'alpha',  # Sort operations alphabetically
     },
+    'TAGS': [
+        {'name': 'auth', 'description': 'Authentication endpoints'},
+        {'name': 'users', 'description': 'User management endpoints'},
+        {'name': 'profiles', 'description': 'User profile endpoints'},
+        {'name': 'articles', 'description': 'Article management endpoints'},
+        {'name': 'ratings', 'description': 'Article rating endpoints'},
+        {'name': 'search', 'description': 'Search functionality endpoints'},
+    ],
 }

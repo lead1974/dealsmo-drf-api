@@ -5,6 +5,7 @@ from django.core.files.storage import default_storage
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import filters, generics, permissions, status, viewsets
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
@@ -21,6 +22,7 @@ User = get_user_model()
 logger = logging.getLogger(__name__)
 
 
+@extend_schema(tags=['articles'])
 class ArticleViewSet(viewsets.ModelViewSet):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
@@ -72,6 +74,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
+@extend_schema(tags=['articles'])
 class ArticleViewCountView(generics.RetrieveAPIView):
     queryset = Article.objects.all()
     lookup_field = "slug"
@@ -82,6 +85,7 @@ class ArticleViewCountView(generics.RetrieveAPIView):
         return Response({"view_count": article.view_count()})
 
 
+@extend_schema(tags=['articles'])
 class ClapArticleView(generics.CreateAPIView, generics.DestroyAPIView):
     queryset = Clap.objects.all()
     serializer_class = ClapSerializer
@@ -116,6 +120,7 @@ class ClapArticleView(generics.CreateAPIView, generics.DestroyAPIView):
         )
 
 
+@extend_schema(tags=['articles'])
 class ArticleCategoryViewSet(viewsets.ModelViewSet):
     queryset = ArticleCategory.objects.all()
     serializer_class = ArticleCategorySerializer

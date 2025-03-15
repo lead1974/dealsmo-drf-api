@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics, permissions
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import get_object_or_404
@@ -6,6 +7,7 @@ from .models import Article, ArticleResponse
 from .serializers import ArticleResponseSerializer
 
 
+@extend_schema(tags=['articles'])
 class ArticleResponseListCreateView(generics.ListCreateAPIView):
     queryset = ArticleResponse.objects.all()
     serializer_class = ArticleResponseSerializer
@@ -28,6 +30,7 @@ class ArticleResponseListCreateView(generics.ListCreateAPIView):
         serializer.save(user=user, article=article)
 
 
+@extend_schema(tags=['articles'])
 class ArticleResponseUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     queryset = ArticleResponse.objects.all()
     serializer_class = ArticleResponseSerializer

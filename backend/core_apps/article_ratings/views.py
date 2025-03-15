@@ -1,4 +1,5 @@
 from django.db import IntegrityError
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics, permissions
 from rest_framework.exceptions import ValidationError
 
@@ -9,6 +10,7 @@ from .models import Rating
 from .serializers import RatingSerializer
 
 
+@extend_schema(tags=['ratings'])
 class RatingCreateView(generics.CreateAPIView):
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer
