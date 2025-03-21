@@ -4,7 +4,9 @@ from .views import (
     GithubLoginView, 
     FacebookLoginView,
     GoogleAuthRedirectView,
-    GoogleCallbackView
+    GoogleCallbackView,
+    InstagramLoginView,
+    TikTokLoginView
 )
 
 app_name = 'social_auth'
@@ -15,4 +17,6 @@ urlpatterns = [
     path('google/callback/', GoogleCallbackView.as_view(), name='google_callback'),
     path('github/', GithubLoginView.as_view(), name='github_login'),
     path('facebook/', FacebookLoginView.as_view(), name='facebook_login'),
+    path('instagram/', InstagramLoginView.as_view(), name='instagram_login'),
+    path('tiktok/', TikTokLoginView.as_view(), name='tiktok_login'),
 ]
