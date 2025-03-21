@@ -8,6 +8,9 @@ pip install -r requirements/local.txt
 git reset --hard origin/main  
 docker system prune -a
 
+# new apps
+cd backend && python manage.py startapp products core_apps/products
+
 # migrations from scratch
 find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
 docker compose -f local.yml run --rm backend python manage.py migrate --fake-initial

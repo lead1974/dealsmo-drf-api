@@ -33,15 +33,25 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    # Django REST Framework
     "rest_framework",
     "rest_framework.authtoken",
+    "corsheaders",
+    
+    # Authentication
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "dj_rest_auth",
+    "dj_rest_auth.registration",
+    "social_django",
+    
+    # Other third party apps
     "django_filters",
     "django_countries",
     "phonenumber_field",
     "drf_yasg",
     "drf_spectacular",
-    "corsheaders",
-    "social_django",
     "taggit",
     "djcelery_email",
     "django_celery_beat",
@@ -58,6 +68,10 @@ LOCAL_APPS = [
     "core_apps.article_bookmarks",
     "core_apps.article_responses",
     "core_apps.article_search",
+    "core_apps.products",
+    "core_apps.product_bookmarks",
+    "core_apps.product_ratings",
+    "core_apps.product_responses",
 ]
 
 
@@ -69,6 +83,7 @@ MIDDLEWARE = [
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -232,27 +247,18 @@ REST_FRAMEWORK = {
     "DEFAULT_FILTER_BACKENDS": [
         "django_filters.rest_framework.DjangoFilterBackend",
     ],
-    "DEFAULT_SCHEMA_CLASS": 'drf_spectacular.openapi.AutoSchema',
-}
-
-SIMPLE_JWT = {
-    "AUTH_HEADER_TYPES": ("Bearer",),
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-    "ROTATE_REFRESH_TOKENS": True,
-    "SIGNING_KEY": env("SIGNING_KEY"),
-    "USER_ID_FIELD": "id",
-    "USER_ID_CLAIM": "user_id",
 }
 
 REST_AUTH = {
     "USE_JWT": True,
-    "JWT_AUTH_COOKIE": None,
-    "JWT_AUTH_REFRESH_COOKIE": None,
+    "JWT_AUTH_COOKIE": "auth",
+    "JWT_AUTH_REFRESH_COOKIE": "refresh-auth",
+    "USER_DETAILS_SERIALIZER": "core_apps.users.serializers.UserSerializer",
 }
 
 AUTHENTICATION_BACKENDS = [
     'social_core.backends.google.GoogleOAuth2',
+    'allauth.account.auth_backends.AuthenticationBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
@@ -262,6 +268,15 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
     'https://www.googleapis.com/auth/userinfo.email',
     'https://www.googleapis.com/auth/userinfo.profile',
 ]
+
+# Allauth settings
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 
 # Social Auth Pipeline
 SOCIAL_AUTH_PIPELINE = (

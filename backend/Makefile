@@ -10,6 +10,9 @@ up:
 down:
 	docker compose -f local.yml down
 
+down-v:
+	docker compose -f local.yml down -v
+
 show-logs:
 	docker compose -f local.yml logs
 
@@ -27,9 +30,6 @@ collectstatic:
 
 superuser:
 	docker compose -f local.yml run --rm backend python manage.py createsuperuser
-
-down-v:
-	docker compose -f local.yml down -v
 
 volume:
 	docker volume inspect src_local_postgres_data
