@@ -18,13 +18,14 @@ python-social-auth==0.3.6
 social-auth-app-django==5.4.0
 social-auth-core==4.5.1
 redis>=5.0.0,<6.0.0
-celery==5.3.4
-flower==1.2.0
+celery==5.3.6
+flower==2.0.1
 django-celery-beat==2.6.0
 django-celery-email>=3.0.0
 django-allauth==0.54.0
 djangorestframework-simplejwt==5.2.2
 dj-rest-auth==3.0.0
+cloudinary==1.39.1
 django-elasticsearch-dsl==7.4
 django-elasticsearch-dsl-drf==0.22.5
 whitenoise==6.6.0

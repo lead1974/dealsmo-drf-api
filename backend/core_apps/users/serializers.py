@@ -12,17 +12,27 @@ User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(source="profile.first_name")
     last_name = serializers.CharField(source="profile.last_name")
+    username = serializers.CharField(source="profile.username")
     gender = serializers.CharField(source="profile.gender")
     phone_number = PhoneNumberField(source="profile.phone_number")
     profile_photo = serializers.ReadOnlyField(source="profile.profile_photo.url")
     country = CountryField(source="profile.country")
     city = serializers.CharField(source="profile.city")
+    reputation = serializers.ReadOnlyField(source="profile.reputation")
+    report_count = serializers.ReadOnlyField(source="profile.report_count")
+    rating = serializers.SerializerMethodField()
+    avatar = serializers.ReadOnlyField(source="profile.avatar.url")
+    is_banned = serializers.ReadOnlyField(source="profile.is_banned")
+
+    def get_rating(self, obj):
+        return obj.profile.get_average_rating()
 
     class Meta:
         model = User
         fields = [
             "id",
             "email",
+            "username",
             "first_name",
             "last_name",
             "gender",
@@ -30,7 +40,14 @@ class UserSerializer(serializers.ModelSerializer):
             "profile_photo",
             "country",
             "city",
+            "reputation",
+            "report_count",
+            "rating",
+            "avatar",
+            "is_banned",
+            "date_joined",
         ]
+        read_only_fields = ["id", "email", "date_joined"]
 
     def to_representation(self, instance):
         representation = super(UserSerializer, self).to_representation(instance)
