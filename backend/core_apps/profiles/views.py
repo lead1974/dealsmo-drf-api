@@ -1,12 +1,13 @@
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from drf_spectacular.utils import extend_schema
-from rest_framework import generics, status
+from rest_framework import generics, status, filters
 from rest_framework.exceptions import NotFound
 from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django_filters.rest_framework import DjangoFilterBackend
 
 # TODO: change this in production
 from config.settings.local import DEFAULT_FROM_EMAIL
@@ -26,6 +27,8 @@ class ProfileListAPIView(generics.ListAPIView):
     serializer_class = ProfileSerializer
     pagination_class = ProfilePagination
     renderer_classes = [ProfilesJSONRenderer]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    search_fields = ['username', 'first_name', 'last_name', 'about_me', 'city', 'user__email']
 
 
 @extend_schema(tags=['profiles'])

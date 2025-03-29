@@ -320,6 +320,7 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.associate_user',
     'social_core.pipeline.social_auth.load_extra_data',
     'social_core.pipeline.user.user_details',
+    'core_apps.profiles.pipeline.save_profile',
 )
 
 ELASTICSEARCH_DSL_AUTO_REFRESH = True
