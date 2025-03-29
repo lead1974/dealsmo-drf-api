@@ -1,7 +1,7 @@
 import os
 from datetime import timedelta
 from pathlib import Path
-
+import cloudinary 
 import environ
 
 env = environ.Env()
@@ -234,6 +234,16 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": timedelta(days=1),
     }
 }
+
+CLOUDINARY_CLOUD_NAME = env("CLOUDINARY_CLOUD_NAME")
+CLOUDINARY_API_KEY = env("CLOUDINARY_API_KEY")
+CLOUDINARY_API_SECRET = env("CLOUDINARY_API_SECRET")
+
+cloudinary.config(
+    cloud_name=CLOUDINARY_CLOUD_NAME,
+    api_key=CLOUDINARY_API_KEY,
+    api_secret=CLOUDINARY_API_SECRET,
+)
 
 CONN_MAX_AGE = 0  # Disable persistent connections
 

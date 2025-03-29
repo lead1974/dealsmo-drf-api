@@ -16,7 +16,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     last_name = serializers.CharField(required=False)
     email = serializers.EmailField(source="user.email")
     full_name = serializers.SerializerMethodField(read_only=True)
-    profile_photo = serializers.SerializerMethodField()
+    avatar = serializers.SerializerMethodField()
     country = CountryField(name_only=True)
 
     class Meta:
@@ -28,7 +28,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             "last_name",
             "full_name",
             "email",
-            "profile_photo",
+            "avatar",
             "phone_number",
             "gender",
             "country",
@@ -42,8 +42,8 @@ class ProfileSerializer(serializers.ModelSerializer):
         last_name = obj.last_name.title() if obj.last_name else ""
         return f"{first_name} {last_name}".strip()
 
-    def get_profile_photo(self, obj):
-        return obj.profile_photo.url
+    def get_avatar(self, obj):
+        return obj.avatar.url if obj.avatar else None
 
 
 class UpdateProfileSerializer(serializers.ModelSerializer):
@@ -56,7 +56,7 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "phone_number",
-            "profile_photo",
+            "avatar",
             "about_me",
             "gender",
             "country",
@@ -72,7 +72,7 @@ class FollowingSerializer(serializers.ModelSerializer):
             "username",
             "first_name",
             "last_name",
-            "profile_photo",
+            "avatar",
             "about_me",
             "twitter_handle",
         ]
