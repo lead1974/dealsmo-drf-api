@@ -63,6 +63,7 @@ LOCAL_APPS = [
     "core_apps.profiles",
     "core_apps.common",
     "core_apps.users",
+    "core_apps.website_issues",
     "core_apps.articles",
     "core_apps.article_ratings",
     "core_apps.article_bookmarks",
@@ -94,7 +95,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [str(APP_DIR / "templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

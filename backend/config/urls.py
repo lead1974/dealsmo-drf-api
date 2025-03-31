@@ -34,6 +34,7 @@ urlpatterns = [
         name="password_reset_confirm",
     ),
     path("api/v1/profiles/", include("core_apps.profiles.urls")),
+    path("api/v1/website-issues/", include("core_apps.website_issues.urls")),
     path("api/v1/articles/", include("core_apps.articles.urls")),
     path("api/v1/article-ratings/", include("core_apps.article_ratings.urls")),
     path("api/v1/article-bookmarks/", include("core_apps.article_bookmarks.urls")),
