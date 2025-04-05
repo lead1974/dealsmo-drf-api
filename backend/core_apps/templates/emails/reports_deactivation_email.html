@@ -1,0 +1,17 @@
+{% extends "emails/base.html" %}
+
+{% block title %} Account Deactivation Notice! {% endblock title %}
+
+{% block content %}
+<p>Dear {{ user.email }},</p>
+<p>Your account has been deactivated due to multiple reports(10 incidence reports).</p>
+<p>The last report received was : <strong> {{ title }}</strong></p>
+<p><strong>{{ description }}</strong></p>
+<p>Continous instances of feedback to you have fallen on deaf ears.
+</p>
+
+<p>Kindly oblige by the set rules.</p>
+<p>Regards,<br>
+    The {{ site_name }} Team
+</p>
+{% endblock content %}

@@ -73,6 +73,7 @@ LOCAL_APPS = [
     "core_apps.product_bookmarks",
     "core_apps.product_ratings",
     "core_apps.product_responses",
+    "core_apps.reports",
 ]
 
 

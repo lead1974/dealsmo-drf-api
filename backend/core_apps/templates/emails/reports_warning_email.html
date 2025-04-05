@@ -1,0 +1,17 @@
+{% extends "emails/base.html" %}
+
+{% block title %} You have been reported! {% endblock title %}
+
+{% block content %}
+<p>Dear {{ user.email }},</p>
+<p>You have been reported for the following issue:</p>
+<p><strong>{{ title }}</strong></p>
+<p>Description: <strong> {{ description }}</strong></p>
+<p>Kindly address this issue, to avoid further complaints and reports by other site tenants</p>
+<p>Please note that if you are reported 10 times your account will be deactivated
+</p>
+
+<p>Regards,<br>
+  The {{ site_name }} Team
+</p>
+{% endblock content %}
