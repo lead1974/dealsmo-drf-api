@@ -8,16 +8,67 @@ from core_apps.articles.models import Article
 class ArticleDocument(Document):
     id = fields.KeywordField()
     slug = fields.KeywordField()
-    title = fields.TextField(attr="title")
-    description = fields.TextField(attr="description")
-    body = fields.TextField(attr="body")
-    author_username = fields.TextField()
-    author_email = fields.TextField()
+    title = fields.TextField(
+        attr="title",
+        analyzer='standard',
+        fields={
+            'raw': fields.KeywordField(),
+            'ngram': fields.TextField(analyzer='ngram_analyzer')
+        }
+    )
+    description = fields.TextField(
+        attr="description",
+        analyzer='standard',
+        fields={
+            'raw': fields.KeywordField(),
+            'ngram': fields.TextField(analyzer='ngram_analyzer')
+        }
+    )
+    body = fields.TextField(
+        attr="body",
+        analyzer='standard',
+        fields={
+            'raw': fields.KeywordField(),
+            'ngram': fields.TextField(analyzer='ngram_analyzer')
+        }
+    )
+    author_username = fields.TextField(
+        analyzer='standard',
+        fields={'raw': fields.KeywordField()}
+    )
+    author_email = fields.TextField(
+        analyzer='standard',
+        fields={'raw': fields.KeywordField()}
+    )
     tags = fields.KeywordField()
 
     class Index:
         name = "articles"
-        settings = {"number_of_shards": 1, "number_of_replicas": 0}
+        settings = {
+            "number_of_shards": 1,
+            "number_of_replicas": 0,
+            "analysis": {
+                "analyzer": {
+                    "standard": {
+                        "type": "custom",
+                        "tokenizer": "standard",
+                        "filter": ["lowercase", "asciifolding", "word_delimiter", "trim", "snowball"]
+                    },
+                    "ngram_analyzer": {
+                        "type": "custom",
+                        "tokenizer": "standard",
+                        "filter": ["lowercase", "asciifolding", "ngram_filter"]
+                    }
+                },
+                "filter": {
+                    "ngram_filter": {
+                        "type": "ngram",
+                        "min_gram": 3,
+                        "max_gram": 4
+                    }
+                }
+            }
+        }
 
     class Django:
         model = Article

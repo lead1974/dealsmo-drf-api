@@ -1,0 +1,97 @@
+# Cursor AI Rules for Django REST Framework Backend Project
+
+project_framework: django
+language: python
+python_version: "3.12"
+
+# Package Management
+requirements:
+  base_file: requirements/base.txt
+  local_file: requirements/local.txt
+  production_file: requirements/production.txt
+
+# Django Project Structure
+folder_structure:
+  - core_apps/
+  - docker/
+  - config/
+  - config/settings/
+  - static/
+  - mediafiles/
+  - templates/
+  - requirements/
+  - utils/
+
+# Code Generation Rules
+code_style:
+  formatter: black
+  line_length: 88
+  import_sorting: isort
+  linter: flake8
+
+# Django REST Framework API Patterns
+api_patterns:
+  viewset_style: ModelViewSet
+  serializer_style: ModelSerializer
+  url_naming: hyphenated-kebab-case
+  pagination: PageNumberPagination
+  filtering: django_filter
+  documentation: drf_spectacular
+  authentication: JWT
+
+# Django Models Best Practices
+model_practices:
+  abstract_base_classes: true
+  soft_delete: true
+  timestamps: true
+  uuid_primary_keys: true
+  descriptive_related_names: true
+  custom_managers: true
+
+# Serializer Patterns
+serializer_patterns:
+  nested_serializers: true
+  read_write_serializers: true
+  hyperlinked_identity: true
+  field_level_validation: true
+  custom_field_mapping: true
+  dynamic_fields: true
+
+# Authentication & Authorization
+auth_config:
+  token_auth: JWT
+  social_auth: true
+  registration: dj_rest_auth
+  permission_classes: custom
+  throttling: true
+
+# Database Configuration
+database:
+  engine: postgresql
+  migration_style: squashed
+  indexes: true
+  constraints: true
+
+# Testing Configuration
+testing:
+  framework: pytest
+  factory: pytest_factoryboy
+  fixtures: true
+  coverage: pytest_cov
+  api_client: APIClient
+
+# Celery Configuration
+celery_config:
+  broker: redis
+  result_backend: redis
+  beat: true
+  flower: true
+  task_patterns: class_based
+
+# Deployment Configuration
+deployment:
+  environment:
+    staging:
+      settings: config.settings.staging
+    production:
+      settings: config.settings.production

@@ -64,6 +64,10 @@ es-populate:
 	docker compose -f local.yml exec backend python manage.py search_index --populate	
 es-sync:
 	docker compose -f local.yml exec backend python manage.py search_index --rebuild	
+es-delete-index:
+	docker compose -f local.yml exec backend python manage.py search_index --delete
+es-verify-search:
+	docker compose -f local.yml exec backend python manage.py verify_search $(search_term)
 
 db-backup:
 	docker compose -f local.yml exec postgres backup
