@@ -8,6 +8,11 @@ router.register(r"article-categories", ArticleCategoryViewSet, basename="article
 router.register(r"", ArticleViewSet, basename="article")
 
 urlpatterns = [
+    path("categories/", ArticleCategoryViewSet.as_view({"get": "list"}), name="article-categories"),
+    path("all/", ArticleViewSet.as_view({"get": "all"}), name="article-all"),
+    path("published/", ArticleViewSet.as_view({"get": "published"}), name="article-published"),
+    path("archived/", ArticleViewSet.as_view({"get": "archived"}), name="article-archived"),
+    path("draft/", ArticleViewSet.as_view({"get": "draft"}), name="article-draft"),
     path("", include(router.urls)),
     path(
         "<slug:slug>/view-count/",

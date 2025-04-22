@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 
 from django.contrib.auth import get_user_model
 from django.core.files.storage import default_storage
@@ -9,6 +10,7 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import filters, generics, permissions, status, viewsets
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
+from django.utils import timezone
 
 from .filters import ArticleFilter
 from .models import Article, ArticleView, Clap, ArticleCategory
@@ -35,10 +37,81 @@ class ArticleViewSet(viewsets.ModelViewSet):
     parser_classes = [MultiPartParser, FormParser, JSONParser]
     lookup_field = "slug"
 
+    def get_renderer_classes(self):
+        if self.action == 'published':
+            return [ArticlesJSONRenderer]
+        return [ArticleJSONRenderer]
+
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [permissions.IsAuthenticated(), IsOwnerOrReadOnly()]
         return [permissions.AllowAny()]
+
+    @extend_schema(
+        description="Get all articles regardless of status",
+        responses={200: ArticleSerializer(many=True)}
+    )
+    def all(self, request):
+        queryset = self.get_queryset()
+        
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @extend_schema(
+        description="Get all draft articles",
+        responses={200: ArticleSerializer(many=True)}
+    )
+    def draft(self, request):
+        queryset = self.get_queryset().filter(
+            status=Article.Status.DRAFT
+        )
+        
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @extend_schema(
+        description="Get all archived articles",
+        responses={200: ArticleSerializer(many=True)}
+    )
+    def archived(self, request):
+        now = timezone.now()
+        queryset = self.get_queryset().filter(
+            status=Article.Status.ARCHIVED
+        )
+        
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @extend_schema(
+        description="Get all published articles",
+        responses={200: ArticleSerializer(many=True)}
+    )
+    def published(self, request):
+        now = timezone.now()
+        queryset = self.get_queryset().filter(
+            status=Article.Status.PUBLISHED,
+            start_date__lte=now,
+            end_date__gt=now
+        )
+        
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)

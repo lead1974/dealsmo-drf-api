@@ -95,3 +95,17 @@ deployment:
       settings: config.settings.staging
     production:
       settings: config.settings.production
+
+      # Article Publication Rules
+- Published articles are publicly accessible to anyone without authentication
+- The /api/v1/articles/published/ endpoint must be accessible without authentication
+- Published articles are those with:
+  * status = PUBLISHED
+  * start_date <= current_time
+  * end_date > current_time
+- No separate serializer is needed for published articles
+- The status field in published articles context should allow public read access
+- Article modification (create/update/delete) still requires authentication
+- Article viewing and reading published articles does not require authentication
+
+# Existing Rules 
